@@ -1,6 +1,7 @@
 package com.vish.pms.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vish.pms.dto.ProductRequestDto;
@@ -54,7 +55,7 @@ public class ProductController {
     // ✅ Create product
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(
-        @Valid @RequestBody ProductRequestDto requestDto) {
+            @Valid @RequestBody ProductRequestDto requestDto) {
 
         Product product = ProductMapper.toEntity(requestDto);
         Product saved = productService.create(product);
@@ -79,6 +80,21 @@ public class ProductController {
                 .toList();
 
         return ResponseEntity.status(201).body(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc", name = "dir") String direction) {
+
+        List<Product> productPage = productService.paginatedSorted(page, size, sortBy, direction);
+        List<ProductResponseDto> response = productPage.stream()
+                                            .map(ProductMapper::toResponse)
+                                            .toList();
+
+        return ResponseEntity.ok(response);
     }
 
     // ✅ Update product
