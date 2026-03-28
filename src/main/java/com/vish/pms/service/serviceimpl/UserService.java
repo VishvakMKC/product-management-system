@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vish.pms.entity.User;
@@ -20,13 +21,17 @@ public class UserService implements CrudService<User, UUID> {
 
     private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User create(User entity) {
         // TODO Auto-generated method stub
+        entity.setPassword((passwordEncoder.encode(entity.getPassword())));
         return userRepository.save(entity);
     }
 
@@ -37,7 +42,7 @@ public class UserService implements CrudService<User, UUID> {
                 .orElseThrow(() -> new RuntimeException("User not foudn with the provided id"));
         user.setName(entity.getName());
         user.setEmail(entity.getEmail());
-        user.setPassword(entity.getPassword());
+        user.setPassword(passwordEncoder.encode(entity.getPassword()));
         user.setRole(entity.getRole());
 
         return userRepository.save(user);
