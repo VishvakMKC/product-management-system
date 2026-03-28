@@ -90,6 +90,7 @@ public class UserService implements CrudService<User, UUID> {
     {
         if(users == null || users.isEmpty())
             throw new IllegalArgumentException("Users list cannot be empty.");
+        users.forEach(user -> user.setPassword(passwordEncoder.encode(user.getPassword())));
         return userRepository.saveAll(users);
     }
 

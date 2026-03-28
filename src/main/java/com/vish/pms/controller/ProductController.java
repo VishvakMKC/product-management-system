@@ -37,20 +37,6 @@ public class ProductController {
     }
 
     // ✅ Get all products
-    @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc", name = "dir") String direction) {
-
-        List<Product> productPage = productService.getAll( page > 0 ? page = page - 1 : page, size, sortBy, direction);
-        List<ProductResponseDto> response = productPage.stream()
-                .map(ProductMapper::toResponse)
-                .toList();
-
-        return ResponseEntity.ok(response);
-    }
 
     // ✅ Get product by ID
     @GetMapping("/{id}")

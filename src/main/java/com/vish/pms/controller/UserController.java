@@ -3,6 +3,7 @@ package com.vish.pms.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vish.pms.config.CustomUserDetails;
 import com.vish.pms.dto.UserRequestDto;
 import com.vish.pms.dto.UserResponseDto;
 import com.vish.pms.entity.User;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,17 +36,18 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/new")
     public UserResponseDto createNewUser (@RequestBody @Valid UserRequestDto userRequestDto) {
         //TODO: process POST request
+
         User user = UserMapper.toEntity(userRequestDto);
         User savedUser  =  userService.create(user);
         return UserMapper.toResponse(savedUser); 
     }
 
-    @GetMapping("/{id}/profile")
-    public UserResponseDto profile(@PathVariable(name = "id" ) UUID id)  {
-        User user = userService.getByID(id);
+    @GetMapping("/me")
+    public UserResponseDto profile(@AuthenticationPrincipal CustomUserDetails userDetails)  {
+        User user = userService.getByID(userDetails.getId());
         return new UserResponseDto(
             user.getId(),
             user.getName(),
@@ -52,10 +56,10 @@ public class UserController {
         );
     }
 
-    @PutMapping("/{id}/update")
-    public UserResponseDto updateUser(@PathVariable(name = "id") UUID id, @Valid @RequestBody UserRequestDto userRequestDto) {
+    @PutMapping("/me")
+    public UserResponseDto updateUser(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody UserRequestDto userRequestDto) {
         //TODO: process PUT request
-
+        
         User newUser = User.builder()
                             .name(userRequestDto.name())
                             .password(userRequestDto.password())
@@ -63,29 +67,17 @@ public class UserController {
                             .role(userRequestDto.role())
                             .build();
         
-        User updatedUser = userService.update(id, newUser);
+        User updatedUser = userService.update(userDetails.getId(), newUser);
         return new UserResponseDto(updatedUser.getId(),updatedUser.getName(), updatedUser.getEmail(), updatedUser.getRole());
     }
     
-    @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> deleteUser(@PathVariable(name = "id") UUID id) {
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         //TODO: process PUT request
 
-        userService.deleteById(id);
+        userService.deleteById(userDetails.getId());
         return ResponseEntity.ok("User deleted successfully");
     }
     
 
-    @GetMapping("/getAll")
-    public List<UserResponseDto> getAllUsers(
-        @RequestParam(defaultValue = "0" ) int page,
-        @RequestParam(defaultValue = "5") int size,
-        @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "asc")  String dir
-    ) {
-        return userService.getAll(page, size, sortBy, dir).stream()
-                    .map(UserMapper::toResponse)
-                    .toList();
-    }
-    
 }
