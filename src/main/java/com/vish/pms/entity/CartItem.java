@@ -1,18 +1,14 @@
 package com.vish.pms.entity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,23 +16,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "carts")
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "cartitem")
 @Getter
 @Setter
-public class Cart {
+@AllArgsConstructor
+@NoArgsConstructor
+public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", unique = true)
-    private User user;
+    @ManyToOne
+    @JoinColumn
+    private Product product;
+    @ManyToOne
+    @JoinColumn
+    private Cart cart;
+    private Integer quantity;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> items = new ArrayList<>();
+    private BigDecimal price;
 
-    private BigDecimal totalPrice = BigDecimal.ZERO;
 }
