@@ -21,6 +21,7 @@ import com.vish.pms.dto.UserRequestDto;
 import com.vish.pms.dto.UserResponseDto;
 import com.vish.pms.entity.Product;
 import com.vish.pms.entity.User;
+import com.vish.pms.enums.Role;
 import com.vish.pms.mapping.ProductMapper;
 import com.vish.pms.mapping.UserMapper;
 import com.vish.pms.service.serviceimpl.ProductService;
@@ -72,18 +73,37 @@ public class AdminController {
                 .toList();
     }
 
+    @PostMapping("/newUser")
+    public UserResponseDto createNewUser(@RequestBody @Valid UserRequestDto userRequestDto) {
+        // TODO: process POST request
+
+        User user = UserMapper.toEntity(userRequestDto);
+        user.setRole(Role.USER);
+        User savedUser = userService.create(user);
+        return UserMapper.toResponse(savedUser);
+    }
+
     @PostMapping("/users/bulk")
     public List<UserResponseDto> createAllUsers(@RequestBody @Valid List<UserRequestDto> userRequestDtos) {
-        //TODO: process POST request
+        // TODO: process POST request
         List<User> users = userRequestDtos.stream().map(UserMapper::toEntity).toList();
-        List<User> savedUsers = userService.createAll(users); 
+        List<User> savedUsers = userService.createAll(users);
         return savedUsers.stream().map(UserMapper::toResponse).toList();
     }
-    
 
     @GetMapping("/users/{id}")
     public UserResponseDto getUserById(@PathVariable UUID id) {
         return UserMapper.toResponse(userService.getByID(id));
+    }
+
+    @PostMapping("/newAdmin")
+    public UserResponseDto createNewAdmin(@RequestBody @Valid UserRequestDto userRequestDto) {
+        // TODO: process POST request
+
+        User user = UserMapper.toEntity(userRequestDto);
+        user.setRole(Role.ADMIN);
+        User savedUser = userService.create(user);
+        return UserMapper.toResponse(savedUser);
     }
 
     @PostMapping("/users")

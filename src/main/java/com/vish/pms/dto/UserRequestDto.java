@@ -12,7 +12,6 @@ public record UserRequestDto(
 
         @NotBlank(message = "Email is required") @Email(message = "Invalid Email formt") String email,
 
-        @NotBlank(message = "Password is required") @Size(min = 6, message = "Password must be atleast 6 characters long") String password,
-
-        @NotNull(message = "Role is required") Role role) {
+        @NotBlank(message = "Password is required") @Size(min = 6, message = "Password must be atleast 6 characters long") String password
+) {
 }

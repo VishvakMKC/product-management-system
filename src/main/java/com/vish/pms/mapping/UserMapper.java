@@ -11,13 +11,12 @@ public class UserMapper {
         return User.builder().email(userRequestDto.email())
                 .name(userRequestDto.name())
                 .password(userRequestDto.password())
-                .role(userRequestDto.role())
                 .build();
     }
 
     public static UserResponseDto toResponse(User user) {
         if (user == null)
             return null;
-        return new UserResponseDto(user.getId(), user.getName(), user.getEmail(), user.getRole());
+        return new UserResponseDto(user.getId(), user.getName(), user.getEmail());
     }
 }

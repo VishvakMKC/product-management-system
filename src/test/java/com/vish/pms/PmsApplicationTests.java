@@ -1,33 +1,37 @@
 package com.vish.pms;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import org.springframework.boot.test.mock.web.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vish.pms.controller.AdminController;
+import com.vish.pms.controller.ProductController;
+import com.vish.pms.controller.UserController;
+import com.vish.pms.dto.ProductRequestDto;
+import com.vish.pms.dto.UserRequestDto;
+import com.vish.pms.entity.Cart;
+import com.vish.pms.entity.Product;
+import com.vish.pms.entity.User;
+import com.vish.pms.service.serviceimpl.CartService;
+import com.vish.pms.service.serviceimpl.ProductService;
+import com.vish.pms.service.serviceimpl.UserService;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.vish.pms.controller.ProductController;
-import com.vish.pms.dto.ProductRequestDto;
-import com.vish.pms.entity.Product;
-import com.vish.pms.service.serviceimpl.ProductService;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 
-@WebMvcTest(ProductController.class)
-class PmsApplicationTests {
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest({UserController.class, AdminController.class, ProductController.class})
+@AutoConfiguration
+class ControllerTestSuite {
 
 }
