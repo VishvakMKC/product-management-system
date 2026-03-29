@@ -10,17 +10,21 @@ import com.vish.pms.dto.UserRequestDto;
 import com.vish.pms.dto.UserResponseDto;
 import com.vish.pms.entity.Cart;
 import com.vish.pms.entity.User;
+import com.vish.pms.enums.Role;
 import com.vish.pms.mapping.CartMapper;
 import com.vish.pms.mapping.UserMapper;
 import com.vish.pms.service.serviceimpl.CartService;
 import com.vish.pms.service.serviceimpl.UserService;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,28 +35,41 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
-public class UserController {
-    private UserService userService;
-    private final CartService cartService;
 
-    @PostMapping("/new")
+public class UserController {
+
+    private UserService userService;
+    private CartService cartService;
+
+    public UserController(UserService userService, CartService cartService) {
+        this.userService = userService;
+        this.cartService = cartService;
+    }
+
+    @PostMapping("/register")
     public UserResponseDto createNewUser(@RequestBody @Valid UserRequestDto userRequestDto) {
         // TODO: process POST request
 
         User user = UserMapper.toEntity(userRequestDto);
+        user.setRole(Role.USER);
         User savedUser = userService.create(user);
         return UserMapper.toResponse(savedUser);
     }
 
     @GetMapping("/me")
     public UserResponseDto profile(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        System.out.println("UserDetails received: " + userDetails); // ✅ Debug print
+
+        if (userDetails == null) {
+            System.out.println("userDetails is null!");
+            throw new RuntimeException("AuthenticationPrincipal is null");
+        }
+
         User user = userService.getByID(userDetails.getId());
         return new UserResponseDto(
                 user.getId(),
                 user.getName(),
-                user.getEmail(),
-                user.getRole());
+                user.getEmail());
     }
 
     @PutMapping("/me")
@@ -64,12 +81,10 @@ public class UserController {
                 .name(userRequestDto.name())
                 .password(userRequestDto.password())
                 .email(userRequestDto.email())
-                .role(userRequestDto.role())
                 .build();
 
         User updatedUser = userService.update(userDetails.getId(), newUser);
-        return new UserResponseDto(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(),
-                updatedUser.getRole());
+        return new UserResponseDto(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail());
     }
 
     @DeleteMapping("/me")

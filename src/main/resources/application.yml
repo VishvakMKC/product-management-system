@@ -9,6 +9,15 @@ spring:
     hibernate:
       ddl-auto: update
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  
+  session:
+    store-type: redis
+    timeout: 30m
+
 server:
   port: 8082
 
